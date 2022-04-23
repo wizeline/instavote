@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../base
+patchesStrategicMerge:
+- deployment.yaml
+- service.yaml
+replicas:
+  - name: vote
+    count: 2
+
+commonAnnotations:
+  supported-by: support@fluxcd.io
+
+configMapGenerator:
+  - name: vote-options
+    envs:
+     - options.env
