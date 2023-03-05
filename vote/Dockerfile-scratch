@@ -1,5 +1,6 @@
 # Using official python runtime base image
-FROM python:2.7-alpine
+ARG PYTHON_VERSION=3
+FROM python:${PYTHON_VERSION}-slim
 
 # Set the application directory
 WORKDIR /app
