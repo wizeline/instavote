@@ -50,3 +50,15 @@ Fixing the first iteration of the code we added the next changes
 1. Publish Test Results to the Action Run
 1. Introduces `pytest-cov` to track Coverage information
 1. Publish Coverage Data
+
+### Add container builds for the `vote` application
+
+The goal here is to introduce Docker builds for the application along with some other refactorings
+to improve configurability.
+
+1. Add `PYTHON_VERSION` to the workflow execution
+1. Add `container` job to perform the next tasks
+    1. Dependency on the build job
+    1. Set Qemu for multi-arch builds
+    1. Set BuildX for improved performance
+    1. Local Build for Images (not pushing)
