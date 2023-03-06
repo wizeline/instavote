@@ -1,19 +1,19 @@
 name: Java application
 
 on:
-  push:
-  pull_request:
-    paths:
-      - "worker/**"
-      - ".github/workflows/maven-app.yaml"
-      - ".github/workflows/container-build.yaml"
+  workflow_call:
+    inputs:
+      MICROSERVICE:
+        description: "Component to build"
+        type: string
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/worker
+        working-directory: ${{ github.workspace }}/${{ inputs.MICROSERVICE }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,7 +26,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ github.job }}-${{ hashFiles('worker/**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ github.job }}-${{ hashFiles('${{ inputs.MICROSERVICE }}/**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-${{ github.job }}
 
@@ -39,19 +39,16 @@ jobs:
   container:
     needs:
       - build
-    permissions:
-      packages: write
-      contents: read
     uses: ./.github/workflows/container-build.yaml
     with:
-      MICROSERVICE: worker
+      MICROSERVICE: ${{ inputs.MICROSERVICE }}
 
   smoke-test:
     needs: [container]
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/worker
+        working-directory: ${{ github.workspace }}/${{ inputs.MICROSERVICE }}
     steps:
       - uses: actions/checkout@v4
 
@@ -71,7 +68,7 @@ jobs:
         run: |
           set -x; WAIT_TIME=0; MAX_RETRIES=5;
           until [ "${WAIT_TIME}" -eq "${MAX_RETRIES}" ] || [[ -n "$(docker compose logs --no-log-prefix | grep 'Watching vote queue')" ]]; do
-            echo "Waiting for 'worker' to come up"
+            echo "Waiting for '${{ inputs.MICROSERVICE }}' to come up"
             WAIT_TIME=$(( WAIT_TIME + 1 ))
             sleep "${WAIT_TIME}"
           done;

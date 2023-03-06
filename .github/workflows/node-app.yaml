@@ -1,12 +1,12 @@
 name: Node application
 
 on:
-  push:
-  pull_request:
-    paths:
-      - 'result/**'
-      - '.github/workflows/node-app.yaml'
-      - '.github/workflows/container-build.yaml'
+  workflow_call:
+    inputs:
+      MICROSERVICE:
+        description: "Component to build"
+        type: string
+        required: true
 
 env:
   NODE_VERSION: 13
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/result
+        working-directory: ${{ github.workspace }}/${{ inputs.MICROSERVICE }}
     outputs:
       runtime-version: ${{ steps.set-result.outputs.result }}
     steps:
@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
-          cache-dependency-path: ./result/package-lock.json
+          cache-dependency-path: ./${{ inputs.MICROSERVICE }}/package-lock.json
 
       - name: Install
         run: npm ci
@@ -45,12 +45,9 @@ jobs:
   container:
     needs:
       - build
-    permissions:
-      packages: write
-      contents: read
     uses: ./.github/workflows/container-build.yaml
     with:
-      MICROSERVICE: result
+      MICROSERVICE: ${{ inputs.MICROSERVICE }}
       BUILD-ARGS: "NODE_VERSION=${{ needs.build.outputs.runtime-version }}"
 
   smoke-test:
@@ -58,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ github.workspace }}/result
+        working-directory: ${{ github.workspace }}/${{ inputs.MICROSERVICE }}
     env:
       PORT: 8080
     steps:

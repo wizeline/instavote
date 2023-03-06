@@ -102,3 +102,12 @@ Introduce the node application `results` build via its own workflow [node-app.ya
     1. Add Unit Test Checks
     1. Add Container builds
     1. Add smoke test
+
+### Introduce Pull Request workflow
+
+Introduce [pull-request.yaml](.github/workflows/pull-request.yaml) workflow and
+reusable workflows templates `workflow_call` to track from a simple point the interactions
+between modules.
+
+1. Convert language-oriented workflows into reusable workflows to be called.
+1. Parametrize by `MICROSERVICE`

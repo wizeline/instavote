@@ -1,0 +1,32 @@
+name: Pull Request
+
+on:
+  pull_request:
+  push:
+
+
+jobs:
+  python:
+    uses: ./.github/workflows/python-app.yaml
+    permissions:
+      packages: write
+      contents: read
+      checks: write
+    with:
+      MICROSERVICE: vote
+
+  maven:
+    uses: ./.github/workflows/maven-app.yaml
+    permissions:
+      packages: write
+      contents: read
+    with:
+      MICROSERVICE: worker
+
+  node:
+    uses: ./.github/workflows/node-app.yaml
+    permissions:
+      packages: write
+      contents: read
+    with:
+      MICROSERVICE: result
