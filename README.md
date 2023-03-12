@@ -1,39 +1,28 @@
-Example Voting (Instavote) App
+# Example Voting (Instavote) App
+
 =========
 
-Getting started
----------------
+## Getting started
 
-Download [Docker](https://www.docker.com/products/overview). If you are on Mac or Windows, [Docker Compose](https://docs.docker.com/compose) will be automatically installed. On Linux, make sure you have the latest version of [Compose](https://docs.docker.com/compose/install/). If you're using [Docker for Windows](https://docs.docker.com/docker-for-windows/) on Windows 10 pro or later, you must also [switch to Linux containers](https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers).
+This is a Polyglot application (python/node/java) that will be used to demonstrate
+some of the common Continous Integration and Continous Delivery practices by leveraging
+[Github Actions](https://docs.github.com/en/actions)](https://docs.github.com/en/actions).
 
-Run in this directory:
-```
-docker-compose up
-```
-The app will be running at [http://localhost:5000](http://localhost:5000), and the results will be at [http://localhost:5001](http://localhost:5001).
-
-Alternately, if you want to run it on a [Docker Swarm](https://docs.docker.com/engine/swarm/), first make sure you have a swarm. If you don't, run:
-```
-docker swarm init
-```
-Once you have your swarm, in this directory run:
-```
-docker stack deploy --compose-file docker-stack.yml vote
-```
-
-Architecture
------
+## Architecture
 
 ![Architecture diagram](architecture.png)
 
-* A Python webapp which lets you vote between two options
-* A Redis queue which collects new votes
-* A .NET worker which consumes votes and stores them in…
+* A Python webapp that lets you vote between two options
+* A Redis queue that collects new votes
+* A Java worker which consumes votes and stores them in…
 * A Postgres database backed by a Docker volume
-* A Node.js webapp which shows the results of the voting in real time
+* A Node.js webapp that shows the results of the voting in real time
 
+### Note
 
-Note
-----
+The voting application only accepts one vote per client. It does not register votes
+if a vote has already been submitted by a client.
 
-The voting application only accepts one vote per client. It does not register votes if a vote has already been submitted from a client.
+## Example
+
+![Example](docs/example.gif)
