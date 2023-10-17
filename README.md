@@ -122,3 +122,16 @@ Introduce Security checks for all the workflows.
     1. Add CodeQL checks
     1. Add License Checking
         1. Generate Dynamic matrix with scripting
+
+### Add Ent to End (E2E) Testing
+
+Introduce auxilairy jobs to run Integration Test
+
+1. Add `test` container to interact with the `vote` and `result` application
+1. Add two mechanisms for E2E
+    1. Docker Compose (docker)
+        1. Install the application via a docker-compose.yaml file with an exit code check.
+    1. Helm Install (k8s + minikube)
+        1. Install minikube with 3 versions
+        1. Instal infrastructure via `kubectl run`
+        1. Install the applications via Helm

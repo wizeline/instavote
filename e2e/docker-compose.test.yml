@@ -3,16 +3,22 @@ version: '2'
 services:
 
   sut:
-    build: ./tests/
+    image: ghcr.io/${REPOSITORY_OWNER-manquintero}/tests:latest
+    build: ../tests/
     depends_on:
       - vote
       - result
       - worker
     networks:
       - front-tier
+    environment:
+      - OPENSSL_CONF=/dev/null
 
   vote:
-    build: ../vote/
+    image: ghcr.io/${REPOSITORY_OWNER-manquintero}/vote:latest
+    build:
+      context: ../vote/
+      dockerfile: Dockerfile-scratch
     ports: ["80"]
     depends_on:
       - redis
@@ -22,7 +28,11 @@ services:
       - back-tier
 
   result:
-    build: .
+    image: ghcr.io/${REPOSITORY_OWNER-manquintero}/result:latest
+    build:
+      context: ../result/
+      args:
+        - NODE_VERSION=13
     ports: ["80"]
     depends_on:
       - redis
@@ -33,6 +43,7 @@ services:
 
   worker:
     build: ../worker/
+    image: ghcr.io/${REPOSITORY_OWNER-manquintero}/worker:latest
     depends_on:
       - redis
       - db
@@ -47,6 +58,8 @@ services:
 
   db:
     image: postgres:9.4
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - "db-data:/var/lib/postgresql/data"
     networks:

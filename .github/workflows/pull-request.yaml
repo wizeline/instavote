@@ -4,6 +4,9 @@ on:
   pull_request:
   push:
 
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   python:
@@ -31,6 +34,12 @@ jobs:
     with:
       MICROSERVICE: result
 
+  test:
+    uses: ./.github/workflows/container-build.yaml
+    with:
+      MICROSERVICE: tests
+      TRIVY-EXIT-CODE: '0'
+
   security:
     uses: ./.github/workflows/security.yaml
     permissions:
@@ -41,3 +50,7 @@ jobs:
       contents: read
     with:
       MICROSERVICES: vote,worker,result
+
+  e2e-test:
+    needs: [python, maven, node, test]
+    uses: ./.github/workflows/test-e2e.yaml
