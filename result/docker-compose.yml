@@ -1,0 +1,32 @@
+name: result
+services:
+  db:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: postgres
+    networks:
+      default: null
+    restart: always
+    volumes:
+    - type: volume
+      source: db-data
+      target: /var/lib/postgresql/data
+      volume: {}
+  result:
+    depends_on:
+      db:
+        condition: service_started
+    image: ghcr.io/${REPOSITORY_OWNER:?}/result:latest
+    networks:
+      default: null
+    ports:
+    - mode: ingress
+      target: 80
+      published: ${PORT:-8080}
+      protocol: tcp
+networks:
+  default:
+    name: result_default
+volumes:
+  db-data:
+    name: worker_db-data
