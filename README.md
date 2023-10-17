@@ -80,3 +80,16 @@ Add Smoke Test for the just built images to check its behavior:
 1. Bring up the application via `docker compose up`
     1. Added `vote/docker-compose.yml` to manage the infrastructure provisioning
 1. Smoke test via `curl` and status code 200
+
+### Add Java Workflow (worker)
+
+Introduce the java application `worker` build via its own workflow [maven-app.yaml](.github/workflows/maven-app.yaml)
+
+1. Add new workflow to build maven projects
+    1. Take advantage of the caches
+    1. Add Unit Test Checks
+    1. Add Container builds
+    1. Add smoke test
+1. Refactored the `check-dirty-repo` into a composite action to be reused
+1. Refactored the `container` build into a Reusable workflow [container-build.yaml](.github/workflows/container-build.yaml)
+1. Add specific path triggers for the application
