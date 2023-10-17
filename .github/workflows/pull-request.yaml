@@ -30,3 +30,14 @@ jobs:
       contents: read
     with:
       MICROSERVICE: result
+
+  security:
+    uses: ./.github/workflows/security.yaml
+    permissions:
+      # required for all workflows
+      security-events: write
+      # only required for workflows in private repositories
+      actions: read
+      contents: read
+    with:
+      MICROSERVICES: vote,worker,result

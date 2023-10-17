@@ -1,0 +1,166 @@
+---
+- - :approve
+  - async
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:55.401727017 Z
+- - :approve
+  - body-parser
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:55.745461276 Z
+- - :approve
+  - cookie-parser
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:56.101513922 Z
+- - :approve
+  - express
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:56.450226449 Z
+- - :approve
+  - method-override
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:56.798156570 Z
+- - :approve
+  - pg
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:57.146775543 Z
+- - :approve
+  - result
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:57.500433313 Z
+- - :approve
+  - socket.io
+  - :who: Manuel Quintero
+    :why: Go Ahead
+    :versions: []
+    :when: 2023-03-10 06:02:57.845122092 Z
+- - :permit
+  - MIT
+  - :who: 
+    :why: 
+    :versions: []
+    :when: 2025-07-01 00:48:32.159868727 Z
+- - :approve
+  - better-assert
+  - :who: 
+    :why: 
+    :versions:
+    - 1.0.2
+    :when: 2025-07-01 00:53:36.730938281 Z
+- - :approve
+  - blob
+  - :who: 
+    :why: 
+    :versions:
+    - 0.0.4
+    :when: 2025-07-01 00:53:37.222946234 Z
+- - :approve
+  - callsite
+  - :who: 
+    :why: 
+    :versions:
+    - 1.0.0
+    :when: 2025-07-01 00:53:37.717617247 Z
+- - :approve
+  - component-bind
+  - :who: 
+    :why: 
+    :versions:
+    - 1.0.0
+    :when: 2025-07-01 00:53:38.222208900 Z
+- - :approve
+  - component-emitter
+  - :who: 
+    :why: 
+    :versions:
+    - 1.1.2
+    :when: 2025-07-01 00:53:38.729848665 Z
+- - :approve
+  - component-inherit
+  - :who: 
+    :why: 
+    :versions:
+    - 0.0.3
+    :when: 2025-07-01 00:53:39.233947109 Z
+- - :approve
+  - indexof
+  - :who: 
+    :why: 
+    :versions:
+    - 0.0.1
+    :when: 2025-07-01 00:53:39.720530810 Z
+- - :approve
+  - inherits
+  - :who: 
+    :why: 
+    :versions:
+    - 2.0.4
+    :when: 2025-07-01 00:53:40.223791212 Z
+- - :approve
+  - object-component
+  - :who: 
+    :why: 
+    :versions:
+    - 0.0.3
+    :when: 2025-07-01 00:53:40.714368081 Z
+- - :approve
+  - pg-int8
+  - :who: 
+    :why: 
+    :versions:
+    - 1.0.1
+    :when: 2025-07-01 00:53:41.195095442 Z
+- - :approve
+  - pgpass
+  - &1
+    :who: 
+    :why: 
+    :versions:
+    - |-
+      Simplified
+      license_finder approvals add qs 6.11.0 --version New
+    :when: 2025-07-01 00:53:41.683724917 Z
+- - :approve
+  - 0.0.3
+  - *1
+- - :approve
+  - semver
+  - :who: 
+    :why: 
+    :versions:
+    - 4.3.6
+    :when: 2025-07-01 00:53:42.196187570 Z
+- - :approve
+  - setprototypeof
+  - :who: 
+    :why: 
+    :versions:
+    - 1.2.0
+    :when: 2025-07-01 00:53:42.685752834 Z
+- - :approve
+  - pgpass
+  - :who: 
+    :why: 
+    :versions:
+    - 0.0.3
+    :when: 2025-07-01 00:54:44.890824780 Z
+- - :approve
+  - qs
+  - :who: 
+    :why: 
+    :versions:
+    - 6.11.0
+    :when: 2025-07-01 00:54:45.432337438 Z

@@ -1,6 +1,6 @@
 # Using official python runtime base image
 ARG PYTHON_VERSION=3
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${PYTHON_VERSION}
 
 # Set the application directory
 WORKDIR /app

@@ -111,3 +111,14 @@ between modules.
 
 1. Convert language-oriented workflows into reusable workflows to be called.
 1. Parametrize by `MICROSERVICE`
+
+### Security Hardening
+
+Introduce Security checks for all the workflows.
+
+1. Trivy for Container Vulnerabilities
+1. Add `security` job to handle security findings
+    1. Check for Leaked secrets via `trufflehog`
+    1. Add CodeQL checks
+    1. Add License Checking
+        1. Generate Dynamic matrix with scripting

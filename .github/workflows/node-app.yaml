@@ -7,6 +7,11 @@ on:
         description: "Component to build"
         type: string
         required: true
+      TRIVY-EXIT-CODE:
+        description: "exit code when vulnerabilities were found"
+        type: string
+        required: false
+        default: "0"
 
 env:
   NODE_VERSION: 10
@@ -49,6 +54,7 @@ jobs:
     with:
       MICROSERVICE: ${{ inputs.MICROSERVICE }}
       BUILD-ARGS: "NODE_VERSION=${{ needs.build.outputs.runtime-version }}"
+      TRIVY-EXIT-CODE: ${{ inputs.TRIVY-EXIT-CODE }}
 
   smoke-test:
     needs: [container]
