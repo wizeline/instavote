@@ -26,3 +26,18 @@ if a vote has already been submitted by a client.
 ## Example
 
 ![Example](docs/example.gif)
+
+## Features
+
+### Introduce Vote Application (python)
+
+This introduces the workflow [python-app.yaml](.github/workflows/python-app.yaml)
+that is triggered whenever a `pull_request` or `push` event is received. It performs
+the next tasks
+
+1. Checkout the source code
+2. Setup Python 3.10
+3. Install Package Dependencies and Auxiliary tools
+4. Runs Linting and Style checks
+5. Runs Automated Unit Tests
+6. Checks for LeftOvers in the code
