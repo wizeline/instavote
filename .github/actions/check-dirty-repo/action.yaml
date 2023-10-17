@@ -1,0 +1,20 @@
+name: "Check Dirty Repository"
+description: "Check if the Repository is clean"
+inputs:
+  fail-on-dirty:
+    description: "whether or not to fail the job if the repo is dirty"
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Check Dirty Repository
+      shell: bash
+      run: |
+        if ! git diff --exit-code; then
+          git status --porcelain
+          if ${{ inputs.fail-on-dirty }}; then
+            echo "::error::Dirty repository found"
+            exit 1
+          fi
+        fi

@@ -1,0 +1,35 @@
+name: worker
+services:
+  db:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: postgres
+    networks:
+      default: null
+    restart: always
+    volumes:
+    - type: volume
+      source: db-data
+      target: /var/lib/postgresql/data
+      volume: {}
+  redis:
+    deploy:
+      replicas: 1
+    image: redis
+    networks:
+      default: null
+  web:
+    depends_on:
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+    image: ghcr.io/${REPOSITORY_OWNER:?}/worker:latest
+    networks:
+      default: null
+networks:
+  default:
+    name: worker_default
+volumes:
+  db-data:
+    name: worker_db-data

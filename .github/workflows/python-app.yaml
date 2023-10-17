@@ -3,9 +3,10 @@ name: Python application
 on:
   push:
   pull_request:
-
-permissions:
-  contents: read
+    paths:
+      - 'vote/**'
+      - '.github/workflows/python-app.yaml'
+      - '.github/workflows/container-build.yaml'
 
 env:
   PYTHON_VERSION: "3.11"
@@ -13,11 +14,14 @@ env:
 jobs:
   build:
     permissions:
+      contents: read
       checks: write
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ github.workspace }}/vote
+    outputs:
+      runtime-version: ${{ steps.set-result.outputs.result }}
 
     steps:
       - uses: actions/checkout@v4
@@ -79,43 +83,27 @@ jobs:
           show_line: true
           show_branch: true
 
-      - name: Check Dirty Repository
-        run: |
-          if ! git diff-index --quiet HEAD; then
-            echo "::error::Dirty repository found"
-            git status --porcelain
-            exit 1
-          fi
+      - name: Check if Dirty
+        uses: ./.github/actions/check-dirty-repo
+
+      - name: Export Runtime Version
+        uses: actions/github-script@v6
+        id: set-result
+        with:
+          script: return "${{ env.PYTHON_VERSION }}"
+          result-encoding: string
 
   container:
-    runs-on: ubuntu-latest
     needs:
       - build
     permissions:
       packages: write
       contents: read
-    steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          push: true
-          context: "{{defaultContext}}:vote"
-          build-args: PYTHON_VERSION=${{ env.PYTHON_VERSION }}
-          file: Dockerfile-scratch
-          tags: ghcr.io/${{ github.repository_owner }}/vote:latest
+    uses: ./.github/workflows/container-build.yaml
+    with:
+      MICROSERVICE: vote
+      DOCKERFILE: Dockerfile-scratch
+      BUILD-ARGS: "PYTHON_VERSION=${{ needs.build.outputs.runtime-version }}"
 
   smoke-test:
     needs: [container]
@@ -150,4 +138,4 @@ jobs:
           done;
           test "${WAIT_TIME}" -lt "${MAX_RETRIES}";
         env:
-          TEST_URL: localhost:${{ env.PORT }}
+          TEST_URL: "localhost:${{ env.PORT }}"

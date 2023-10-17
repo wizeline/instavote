@@ -1,0 +1,80 @@
+name: Java application
+
+on:
+  push:
+  pull_request:
+    paths:
+      - "worker/**"
+      - ".github/workflows/maven-app.yaml"
+      - ".github/workflows/container-build.yaml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ github.job }}-${{ hashFiles('worker/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ github.job }}
+
+      - name: Test
+        run: mvn -B test
+
+      - name: Check if Dirty
+        uses: ./.github/actions/check-dirty-repo
+
+  container:
+    needs:
+      - build
+    permissions:
+      packages: write
+      contents: read
+    uses: ./.github/workflows/container-build.yaml
+    with:
+      MICROSERVICE: worker
+
+  smoke-test:
+    needs: [container]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/worker
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bring up the Application
+        run: docker compose up -d --quiet-pull
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+
+      - name: Run Smoke Test
+        run: |
+          set -x; WAIT_TIME=0; MAX_RETRIES=5;
+          until [ "${WAIT_TIME}" -eq "${MAX_RETRIES}" ] || [[ -n "$(docker compose logs --no-log-prefix | grep 'Watching vote queue')" ]]; do
+            echo "Waiting for 'worker' to come up"
+            WAIT_TIME=$(( WAIT_TIME + 1 ))
+            sleep "${WAIT_TIME}"
+          done;
+          test "${WAIT_TIME}" -lt "${MAX_RETRIES}";
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
