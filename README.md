@@ -93,3 +93,12 @@ Introduce the java application `worker` build via its own workflow [maven-app.ya
 1. Refactored the `check-dirty-repo` into a composite action to be reused
 1. Refactored the `container` build into a Reusable workflow [container-build.yaml](.github/workflows/container-build.yaml)
 1. Add specific path triggers for the application
+
+### Add Node Workflow (results)
+
+Introduce the node application `results` build via its own workflow [node-app.yaml](.github/workflows/node-app.yaml)
+
+1. Add new workflow to build node projects
+    1. Add Unit Test Checks
+    1. Add Container builds
+    1. Add smoke test
