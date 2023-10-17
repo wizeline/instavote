@@ -1,0 +1,162 @@
+name: Leaked Secrets Scan
+on:
+  workflow_call:
+    inputs:
+      MICROSERVICES:
+        description: "Comma-separated values of services to analyze"
+        type: string
+        required: false
+
+jobs:
+  CodeQL:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Prepare the tooling
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python, java, javascript
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  trufflehog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog OSS
+        id: trufflehog
+        uses: trufflesecurity/trufflehog@v3.60.0
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug
+
+      - name: Alert on secret finding
+        if: steps.trufflehog.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('Security Check Failed')
+
+  licenses-prepare:
+    if: inputs.MICROSERVICES
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.result }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare configuration matrix
+        id: set-matrix
+        uses: actions/github-script@v6
+        env:
+          MICROSERVICES: ${{ inputs.MICROSERVICES }}
+        with:
+          result-encoding: string
+          script: |
+            const fs = require('fs')
+            const microservices = process.env['MICROSERVICES'].split(',')
+
+            const packageManagers = new Map([
+                ['requirements.txt', '--python-version=3']
+            ])
+            var extraArgs = new Map()
+
+            for (const microservice of microservices) {
+                for (const packageManager of packageManagers.entries()) {
+                    if (fs.existsSync(`${microservice}/${packageManager[0]}`)) {
+                        extraArgs.set(microservice, packageManager[1])
+                    }
+                }
+            }
+            const matrix = {
+                'include':
+                    microservices.map(m => ({ 'microservice': m, 'extra-args': extraArgs.get(m) }))
+            }
+
+            return JSON.stringify(matrix)
+
+      - name: Debug
+        run: echo ${{ steps.set-matrix.outputs.result }}
+
+  licenses-check:
+    name: License Check (${{ matrix.microservice }})
+    needs: [licenses-prepare]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.licenses-prepare.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.microservice }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1.156.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Install license_finder and dependencies
+        run: |
+          gem install license_finder
+
+          if [[ '${{ matrix.extra-args }}' =~ python ]]; then
+            sudo apt install -y python3-pip
+          fi
+
+      - name: Analyze and Report Licenses
+        id: license-finder
+        run: |
+          license_finder --prepare ${{ matrix.extra-args }}
+          license_finder report -q ${{ matrix.extra-args }} | tee ${{ matrix.microservice }}-licenses.txt
+          # Export relative path for consuption
+          filename=$(realpath --relative-to=${{ github.workspace }} ${{ matrix.microservice }}-licenses.txt)
+          echo "filename=${filename}" | tee -a $GITHUB_OUTPUT
+
+      - name: Report Licenses
+        uses: actions/github-script@v6
+        env:
+          FILENAME: ${{ steps.license-finder.outputs.filename }}
+        with:
+          script: |
+            const fs = require('fs')
+
+            const path = process.env['FILENAME']
+            const file = fs.readFileSync(path, {encoding:'utf8', flag:'r'});
+            const rows = file.split('\n')
+
+            const headers = [
+              {data: 'Package :package:', header: true},
+              {data: 'Version :book:', header: true},
+              {data: 'License :man_judge:', header: true}
+            ]
+
+            core.summary
+              .addHeading('Software Licenses for ${{ matrix.microservice }}')
+              .addTable([
+                headers,
+                ...file.trim().split('\n').map(line => line.split(',',3))
+              ])
+              .write()

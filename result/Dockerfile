@@ -1,5 +1,5 @@
 ARG NODE_VERSION=current
-FROM node:${NODE_VERSION}-alpine
+FROM node:${NODE_VERSION}
 
 RUN mkdir -p /app
 WORKDIR /app

@@ -19,10 +19,17 @@ on:
         description: "Build time arguments"
         type: string
         required: false
+      TRIVY_EXIT_CODE:
+        description: "exit code when vulnerabilities were found"
+        type: string
+        required: false
+        default: "1"
 
 jobs:
   container:
     runs-on: ubuntu-latest
+    env:
+      IMAGE_REF: ghcr.io/${{ github.repository_owner }}/${{ inputs.MICROSERVICE }}:${{ inputs.VERSION }}
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -45,4 +52,14 @@ jobs:
           context: "{{defaultContext}}:${{ inputs.MICROSERVICE }}"
           file: ${{ inputs.DOCKERFILE }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ inputs.MICROSERVICE }}:${{ inputs.VERSION }}
+            ${{ env.IMAGE_REF }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.12.0
+        with:
+          image-ref: ${{ env.IMAGE_REF }}
+          format: 'table'
+          exit-code: ${{ inputs.TRIVY_EXIT_CODE }}
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

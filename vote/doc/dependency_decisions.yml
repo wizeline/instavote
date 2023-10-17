@@ -1,0 +1,89 @@
+---
+- - :approve
+  - Flask
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:00.182946143 Z
+- - :approve
+  - Jinja2
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:38.935379278 Z
+- - :approve
+  - MarkupSafe
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:39.272051047 Z
+- - :approve
+  - Werkzeug
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:39.608400042 Z
+- - :approve
+  - async-timeout
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:39.952278956 Z
+- - :approve
+  - click
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:40.288490593 Z
+- - :approve
+  - gunicorn
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:40.630259691 Z
+- - :approve
+  - itsdangerous
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:40.967886055 Z
+- - :approve
+  - redis
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:41.300641290 Z
+- - :approve
+  - setuptools
+  - :who: Manuel Quintero
+    :why: Go ahead
+    :versions: []
+    :when: 2023-03-10 05:00:41.632244956 Z
+- - :approve
+  - blinker
+  - :who:
+    :why:
+    :versions:
+    - 1.6.3
+    :when: 2023-10-17 02:12:17.766256000 Z
+- - :approve
+  - flask
+  - :who:
+    :why:
+    :versions:
+    - 2.2.5 
+    :when: 2023-10-17 02:12:48.481207000 Z
+- - :approve
+  - packaging
+  - :who:
+    :why:
+    :versions:
+    - '23.2'
+    :when: 2023-10-17 02:13:27.049079000 Z
+- - :approve
+  - werkzeug
+  - :who:
+    :why:
+    :versions:
+    - 3.0.0
+    :when: 2023-10-17 02:13:49.151207000 Z
