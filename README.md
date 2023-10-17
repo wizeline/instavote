@@ -70,3 +70,13 @@ Introduce the faculty to push images to the GitHub registry:
 1. Login to GitHub Container Registry
     1. Secrets are managed by GitHub via `secrets.GITHUB_TOKEN`
     1. Update the Taging and Push settings
+
+### Add smoke test
+
+Add Smoke Test for the just built images to check its behavior:
+
+1. Dependency on the `container` build job.
+1. Login to the GitHub Registry
+1. Bring up the application via `docker compose up`
+    1. Added `vote/docker-compose.yml` to manage the infrastructure provisioning
+1. Smoke test via `curl` and status code 200

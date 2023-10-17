@@ -1,0 +1,24 @@
+name: vote
+services:
+  redis:
+    deploy:
+      replicas: 1
+    image: redis
+    networks:
+      default: null
+  vote:
+    depends_on:
+      redis:
+        condition: service_started
+        required: true
+    image: ghcr.io/${REPOSITORY_OWNER:?}/vote:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: ${PORT:-8080}
+        protocol: tcp
+networks:
+  default:
+    name: vote_default
