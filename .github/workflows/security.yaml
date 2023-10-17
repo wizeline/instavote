@@ -54,7 +54,7 @@ jobs:
 
       - name: Alert on secret finding
         if: steps.trufflehog.outcome == 'failure'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             core.setFailed('Security Check Failed')
