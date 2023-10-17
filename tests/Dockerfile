@@ -1,6 +1,6 @@
-FROM node:8.16.0-jessie-slim
+FROM node:10.22.0-buster-slim
 
-RUN apt-get update -qq && apt-get install -qy \ 
+RUN apt-get update -qq && apt-get install -qy \
     ca-certificates \
     bzip2 \
     curl \

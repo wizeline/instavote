@@ -1,0 +1,79 @@
+on:
+  workflow_call:
+
+jobs:
+  e2e-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run E2E
+        run: |
+          docker compose --file e2e/docker-compose.test.yml up \
+            --no-build \
+            --quiet-pull \
+            --exit-code-from sut
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+
+  e2e-k8s:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        kubernetes-version:
+          - v1.24.11
+          - v1.25.7
+          - latest
+    steps:
+      - name: Collect Workflow Telemetry
+        uses: runforesight/workflow-telemetry-action@v1
+
+      - uses: actions/checkout@v4
+
+      - uses: azure/setup-helm@v3
+        id: install
+        with:
+          version: "latest" # default is latest (stable)
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+
+      - name: Start Minikube
+        id: minikube
+        uses: medyagh/setup-minikube@v0.0.14
+        with:
+          kubernetes-version: ${{ matrix.kubernetes-version }}
+
+      - name: Install Infrastructure Components
+        run: |
+          # Install Redis and Postgres
+          minikube kubectl -- \
+            run redis --image=redis --port 6379 --expose
+          minikube kubectl -- \
+            run db --image=postgres --port 5432 --expose --env="POSTGRES_HOST_AUTH_METHOD=trust"
+          # Wait for pods to be stable
+          minikube kubectl -- \
+            wait --for=condition=ready pod db redis
+
+      - name: Install Projects
+        run: |
+          # Install Components
+          helm install instavote e2e/instavote \
+            --set vote.image.repository=ghcr.io/${OWNER}/vote \
+            --set worker.image.repository=ghcr.io/${OWNER}/worker \
+            --set result.image.repository=ghcr.io/${OWNER}/result \
+            --atomic --debug
+
+          minikube kubectl -- get all
+        env:
+          OWNER: ${{ github.repository_owner }}
+
+      - name: Run Tests
+        run: |
+          minikube kubectl -- \
+            run e2e --image=ghcr.io/manquintero/tests:latest --env="OPENSSL_CONF=/dev/null" --attach
