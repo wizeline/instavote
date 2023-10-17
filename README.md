@@ -62,3 +62,11 @@ to improve configurability.
     1. Set Qemu for multi-arch builds
     1. Set BuildX for improved performance
     1. Local Build for Images (not pushing)
+
+### Login to GitHub Container Registry
+
+Introduce the faculty to push images to the GitHub registry:
+
+1. Login to GitHub Container Registry
+    1. Secrets are managed by GitHub via `secrets.GITHUB_TOKEN`
+    1. Update the Taging and Push settings
