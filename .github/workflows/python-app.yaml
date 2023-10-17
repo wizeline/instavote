@@ -116,3 +116,38 @@ jobs:
           build-args: PYTHON_VERSION=${{ env.PYTHON_VERSION }}
           file: Dockerfile-scratch
           tags: ghcr.io/${{ github.repository_owner }}/vote:latest
+
+  smoke-test:
+    needs: [container]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/vote
+    env:
+      PORT: 8080
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bring up the Application
+        run: docker compose up -d --quiet-pull
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+
+      - name: Run Smoke Test
+        run: |
+          set -x; WAIT_TIME=0; MAX_RETRIES=5;
+          until [ "${WAIT_TIME}" -eq "${MAX_RETRIES}" ] || curl -q ${TEST_URL} 2>/dev/null; do
+            echo "Waiting for ${TEST_URL} to come up"
+            WAIT_TIME=$(( WAIT_TIME + 1 ))
+            sleep "${WAIT_TIME}"
+          done;
+          test "${WAIT_TIME}" -lt "${MAX_RETRIES}";
+        env:
+          TEST_URL: localhost:${{ env.PORT }}
