@@ -91,7 +91,9 @@ jobs:
     uses: ./.github/workflows/test-e2e.yaml
 
   ready:
-    needs: [security, e2e-test]
+    needs: 
+      - security
+      - e2e-test
     runs-on: ubuntu-latest
     steps:
       - name: Generate Release
